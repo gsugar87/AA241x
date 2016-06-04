@@ -163,6 +163,16 @@ void rudder_control(bool isLine){
 	}
 }
 
+void rudder_control_circle(){
+	if(aah_parameters.invert_rud_servo>0)	{yaw_servo_out =  math::constrain(aah_parameters.proportional_rudder_gain*sinf(roll), -1.0f, 1.0f);}
+	else 									{yaw_servo_out = -math::constrain(aah_parameters.proportional_rudder_gain*sinf(roll), -1.0f, 1.0f);}
+}
+
+void rudder_control_line(){
+	yaw_servo_out = 0;
+}
+
+
 float getMissionYaw(){
 	return atan2(low_data.next_E-position_E,low_data.next_N-position_N);
 }
@@ -282,32 +292,20 @@ void flight_control() {
 	//FULL MISSION
 	else{
 		velocity_control();
-        if(aah_parameters.command_alt<=0.0f){
-	        altitude_control(altitude_desired);
-    	}else{
-    		altitude_control(low_data.next_Alt);
-    	}
-
-        rudder_control(low_data.isLine);
-        if(low_data.race_complete<=0.0f){
-        	yaw_desired = getMissionYaw();
-        	if(low_data.isLine){
-				yaw_control(yaw_desired);
+		if (low_data.isLine){
+			// We are in a Line
+			altitude_control(low_data.next_Alt);
+			rudder_control_line();
+			if(low_data.race_complete<=0.0f){
+				yaw_desired = getMissionYaw();
 			}
-			else{
-				high_data.radius_control_mode = aah_parameters.radius_control_by_roll;
-				if(aah_parameters.radius_control_by_roll <=0.0f){
-					radius_control(yaw_desired);
-				}else if(aah_parameters.radius_control_by_roll <=1.0f){
-					radius_control_with_roll();
-				}else{
-					yaw_control(yaw_desired);
-				}
-			}
-        }
-        else{
-        	yaw_control(yaw_desired);
-        }
-        high_data.target_yaw = yaw_desired;
+			yaw_control(yaw_desired);
+		}
+		else{
+			// We are in a Circle
+			rudder_control_circle();
+			altitude_control_circle(low_data.next_Alt);
+			radius_control();
+		}
 	}
 }
