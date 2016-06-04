@@ -1,0 +1,12 @@
+Autopilot Modes:
+
+0 - Full Autopilot
+1 - Velocity
+2 - Pitch
+3 - Altitude
+4 - Roll
+5 - Yaw
+6 - Get Yaw
+7 - Rudder
+8 - Mission
+9 - Manual
