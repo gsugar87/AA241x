@@ -136,8 +136,8 @@ int aah_parameters_init(struct aah_param_handles *h)
 	h->throttle_line				= param_find("AAH_THRO_LINE");
 	h->throttle_circle 				= param_find("AAH_THRO_CIRC");
 
-	h->elevator_trim 				= param_find("AAH_TRIM_AILE");
-	h->aileron_trim 				= param_find("AAH_TRIM_ELEV");
+	h->aileron_trim 				= param_find("AAH_TRIM_AILE");
+	h->elevator_trim 				= param_find("AAH_TRIM_ELEV");
 	h->rudder_trim 					= param_find("AAH_TRIM_RUDD");
 
 	h->set_yaw  					= param_find("TEST_YAW");

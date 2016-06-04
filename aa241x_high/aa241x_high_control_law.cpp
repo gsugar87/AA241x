@@ -102,7 +102,7 @@ void altitude_control(float altitude_desired){
 	float delta_altitude = altitude_desired - (-position_D_gps);
     float pitch_desired = 	aah_parameters.proportional_altitude_gain*delta_altitude +
 							aah_parameters.derivative_altitude_gain*vel_D;
-	pitch_desired = math::constrain(pitch_desired, -PI_F*5.0f/18.0f, PI_F*5.0f/18.0f)
+	pitch_desired = math::constrain(pitch_desired, -PI_F*5.0f/18.0f, PI_F*5.0f/18.0f);
 	high_data.target_pitch = pitch_desired*180.0f/PI_F;
     pitch_control(pitch_desired);
 }
@@ -118,6 +118,7 @@ void roll_control(float roll_desired){
 }
 
 void yaw_control_circle(float yaw_desired){
+	high_data.target_yaw = yaw_desired;
 	float delta_yaw = yaw_desired - yaw;
 	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
 	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
@@ -132,6 +133,7 @@ void yaw_control_circle(float yaw_desired){
 }
 
 void yaw_control(float yaw_desired){
+	high_data.target_yaw = yaw_desired;
 	float delta_yaw = yaw_desired - yaw;
 	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
 	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
