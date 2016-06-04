@@ -89,6 +89,15 @@ void pitch_control(float pitch_desired){
 	else 									{pitch_servo_out = -math::constrain(elevator_desired, -1.0f, 1.0f);}
 }
 
+void altitude_control_circle(float altitude_desired){
+	float delta_altitude = altitude_desired - (-position_D_gps);
+	float roll_desired = aah_parameters.proportional_altitude_gain_circle*delta_altitude +
+						 aah_parameters.derivative_altitude_gain_circle*vel_D +
+						 aah_parameters.circle_roll_trim;
+
+	roll_control(roll_desired);
+}
+
 void altitude_control(float altitude_desired){
 	float delta_altitude = altitude_desired - (-position_D_gps);
     float pitch_desired = aah_parameters.proportional_altitude_gain*(delta_altitude);
