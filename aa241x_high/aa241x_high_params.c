@@ -100,6 +100,11 @@ PARAM_DEFINE_FLOAT(INVERT_ELE_SERV, 0.0f);
 PARAM_DEFINE_FLOAT(AAH_TRACKPY_MOD,0.0f);
 PARAM_DEFINE_FLOAT(AAH_COMMAND_ALT,0.0f);
 
+PARAM_DEFINE_FLOAT(AAH_C_
+
+PARAM_DEFINE_FLOAT(AAH_C_ROLL_TRM,0.0f);
+PARAM_DEFINE_FLOAT(AAH_C_PIT_TRM,0.0f);
+
 int aah_parameters_init(struct aah_param_handles *h)
 {
 
@@ -148,6 +153,8 @@ int aah_parameters_init(struct aah_param_handles *h)
 	
 	h->radius_control_by_roll 		= param_find("AAH_TRACKPY_MOD");
 	h->command_alt   				= param_find("AAH_COMMAND_ALT");
+	
+	h->circle_roll_trim				= param_find("AAH_C_ROLL_TRM");
 	// TODO: add the above line for each of your custom parameters........
 
 	return OK;
@@ -195,5 +202,6 @@ int aah_parameters_update(const struct aah_param_handles *h, struct aah_params *
 	
 	param_get(h->radius_control_by_roll,	 &(p->radius_control_by_roll));
 	param_get(h->command_alt, 				 &(p->command_alt));
+	param_get(h->circle_roll_trim, 			 &(p->circle_roll_trim));
 	return OK;
 }
