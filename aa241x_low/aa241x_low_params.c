@@ -71,7 +71,13 @@ PARAM_DEFINE_FLOAT(BLINE_THETA,35.0f);
 PARAM_DEFINE_FLOAT(BLINE_START_BUFF,10.0f);
 PARAM_DEFINE_FLOAT(LINE_CIRC_BUFF,2.0f);
 
-PARAM_DEFINE_FLOAT(ALT_CLIMB_START, 75.0f);
+PARAM_DEFINE_FLOAT(ALT_CLIMB_START, 10.0f);
+PARAM_DEFINE_FLOAT(ALT_CLIMB_HEIGHT,10.0f);
+PARAM_DEFINE_FLOAT(ALT_0_START,55.0f);
+PARAM_DEFINE_FLOAT(ALT_1_PYLON,51.0f);
+PARAM_DEFINE_FLOAT(ALT_2_PYLON,49.0f);
+PARAM_DEFINE_FLOAT(ALT_3_END,45.0f);
+
 PARAM_DEFINE_FLOAT(ALT_CLIMB_MODE, 0.0f);
 
 // TODO: define custom parameters here
@@ -98,6 +104,11 @@ int aal_parameters_init(struct aal_param_handles *h)
 	h->base_theta			=	param_find("BLINE_THETA");
 	h->prestart_dist		=	param_find("BLINE_START_BUFF");
 	h->alt_climb_start		=	param_find("ALT_CLIMB_START");
+	h->alt_climb_height		=	param_find("ALT_CLIMB_HEIGHT");
+	h->alt_0				=	param_find("ALT_0_START");
+	h->alt_1				=	param_find("ALT_1_PYLON");
+	h->alt_2				=	param_find("ALT_2_PYLON");
+	h->alt_3				=	param_find("ALT_3_END");
 	h->alt_climb_mode		=	param_find("ALT_CLIMB_MODE");
 	// TODO: add the above line for each of your custom parameters........
 	return OK;
@@ -120,6 +131,11 @@ int aal_parameters_update(const struct aal_param_handles *h, struct aal_params *
 	param_get(h->base_theta, 			&(p->base_theta));
 	param_get(h->prestart_dist, 		&(p->prestart_dist));
 	param_get(h->alt_climb_start, 		&(p->alt_climb_start));
+	param_get(h->alt_climb_height, 		&(p->alt_climb_height));
+	param_get(h->alt_0, 				&(p->alt_0));
+	param_get(h->alt_1, 				&(p->alt_1));
+	param_get(h->alt_2, 				&(p->alt_2));
+	param_get(h->alt_3,					&(p->alt_3));
 	param_get(h->alt_climb_mode, 		&(p->alt_climb_mode));
 	// TODO: add the above line for each of your custom parameters.....
 

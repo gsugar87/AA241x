@@ -74,8 +74,7 @@ bool transitionLine();
 void missionControl();
 void updateLineParameters();
 void updateCircleParameters();
-float getLinePercentage(float lengthTraveled);
-float getLineAltDesired(float percentage);
+float getLineAltDesired(float alt_climb_start, float alt_climb_height, float start_to_plane_dist);
 
 
 #endif /* AA241X_SLOW_H_ */

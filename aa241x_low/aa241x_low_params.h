@@ -70,6 +70,11 @@ struct aal_params {
 	float base_theta;
 	float prestart_dist;
 	float alt_climb_start;
+	float alt_climb_height;
+	float alt_0;
+	float alt_1;
+	float alt_2;
+	float alt_3;
 	float alt_climb_mode;
 	// TODO: add custom parameter variable names here......
 };
@@ -99,6 +104,11 @@ struct aal_param_handles {
 	param_t base_theta;
 	param_t prestart_dist;
 	param_t alt_climb_start;
+	param_t alt_climb_height;
+	param_t alt_0;
+	param_t alt_1;
+	param_t alt_2;
+	param_t alt_3;
 	param_t alt_climb_mode;
 	// TODO: add custom parameter variable names here.......
 

@@ -98,32 +98,28 @@ float getLinePercentage(float lengthTraveled){
 	}
 }
 
-float getLineAltDesired(float percentage){
-	/*
-	LOGIC OF DECIDING THE DESIRED ALTITUDE HERE IS JUST AN EXAMPLE.
-	THIS CODE IS TO BE CHANGED.
-	*/
+float getLineAltDesired(float alt_climb_start, float alt_climb_height, float start_to_plane_dist){
+    
 	float altDesired;
     float percentage_start = aal_parameters.alt_climb_start;
-    //MODE = 0.0f, Linear
-    if(aal_parameters.alt_climb_mode <= 0.0f){
-    	if (percentage > percentage_start){
-    		altDesired = startAlt + (percentage-percentage_start)/(100.0f-percentage_start)*(endAlt-startAlt);
-    	}
-    	else{
-    		altDesired = startAlt;
-    	}
+    //Climb down if far from pylon
+    float plane_to_pylon_dist = findDist3D(position_N, endN, position_E, endE)
+    float start_to_pylon_dist = findDist3D(originN, endN, originE, endE)
+    if(plane_to_pylon_dist > alt_climb_start || alt_climb_start <= 0.0f){
+        //Linear
+        float first_section_dist = start_to_pylon_dist-alt_climb_start;
+        altDesired = startAlt + (start_to_plane_dist)/(first_section_dist)*(endAlt-startAlt-alt_climb_height);
     }
-    //MODE = 1.0f, Quadratic
+    //Climb up if close enough to pylon
     else{
-        if (percentage > percentage_start){
-            float a = (endAlt - startAlt)/float(pow(100.0f-percentage_start,2));
-            altDesired = startAlt + a*float(pow(percentage - percentage_start,2));
-        }
-        else{
-            altDesired = startAlt;
-        }
+        altDesired = (endAlt-alt_climb_height) + (alt_climb_start-plane_to_pylon_dist)/(alt_climb_start)*(alt_climb_height);
     }
+    //Quadratic
+        //else{
+        //    float a = (endAlt - startAlt)/float(pow(100.0f-percentage_start,2));
+        //    altDesired = startAlt + a*float(pow(percentage - percentage_start,2));
+        //}
+
 	return altDesired;
 }
 
@@ -176,26 +172,26 @@ float * calcRacePath(float *pylonStart, float *pylon1, float *pylon2){
     //Current to Prestart Pt1
     racePath[6*0+0] = position_N;
     racePath[6*0+1] = position_E;
-    racePath[6*0+2] = mission_parameters.max_alt-5;
+    racePath[6*0+2] = aal_parameters.alt_0;
     racePath[6*0+3] = 50.0f;
     racePath[6*0+4] = -150.0f;
-    racePath[6*0+5] = mission_parameters.max_alt-5;
+    racePath[6*0+5] = aal_parameters.alt_0;
     
     //Prestart Pt1 to Prestart Pt2
     racePath[6*1+0] = 50.0f;
     racePath[6*1+1] = -150.0f;
-    racePath[6*1+2] = mission_parameters.max_alt-5;
+    racePath[6*1+2] = aal_parameters.alt_0;
     racePath[6*1+3] = 120.0f;
     racePath[6*1+4] = -150.0f;
-    racePath[6*1+5] = mission_parameters.max_alt-5;
+    racePath[6*1+5] = aal_parameters.alt_0;
 
     //Prestart Pt2 to Prestart Pt3
     racePath[6*2+0] = 120.0f;
     racePath[6*2+1] = -150.0f;
-    racePath[6*2+2] = mission_parameters.max_alt-5;
+    racePath[6*2+2] = aal_parameters.alt_0;
     racePath[6*2+3] = 150.0f;
     racePath[6*2+4] = -125.0f;
-    racePath[6*2+5] = mission_parameters.max_alt-5;
+    racePath[6*2+5] = aal_parameters.alt_0;
 
     // Get preStarting Point to Start Point
     float buffer = aal_parameters.base_buff;
@@ -215,18 +211,18 @@ float * calcRacePath(float *pylonStart, float *pylon1, float *pylon2){
     //Prestart Pt3 to Prestart Pt4
     racePath[6*3+0] = 150.0f;
     racePath[6*3+1] = -125.0f;
-    racePath[6*3+2] = mission_parameters.max_alt-5;
-    racePath[6*3+3] = start[0] - sinf(target_angle_1)*aal_parameters.prestart_dist;
-    racePath[6*3+4] = start[1] - cosf(target_angle_1)*aal_parameters.prestart_dist;
-    racePath[6*3+5] = mission_parameters.max_alt-5;
+    racePath[6*3+2] = aal_parameters.alt_0;
+    racePath[6*3+3] = start[0]+.1f;// - sinf(target_angle_1)*aal_parameters.prestart_dist;
+    racePath[6*3+4] = start[1]+.1f;// - cosf(target_angle_1)*aal_parameters.prestart_dist;
+    racePath[6*3+5] = aal_parameters.alt_0;
     
     // Get Prestart Pt4 to Start Point
-    racePath[6*4+0] = start[0] - sinf(target_angle_1)*aal_parameters.prestart_dist;
-    racePath[6*4+1] = start[1] - cosf(target_angle_1)*aal_parameters.prestart_dist;
-    racePath[6*4+2] = mission_parameters.max_alt-5;
+    racePath[6*4+0] = start[0]+.1f;// - sinf(target_angle_1)*aal_parameters.prestart_dist;
+    racePath[6*4+1] = start[1]+.1f;// - cosf(target_angle_1)*aal_parameters.prestart_dist;
+    racePath[6*4+2] = aal_parameters.alt_0;
     racePath[6*4+3] = start[0];
     racePath[6*4+4] = start[1];
-    racePath[6*4+5] = mission_parameters.max_alt-5;
+    racePath[6*4+5] = aal_parameters.alt_1;
 
     // Get Start to Inter1
     racePath[6*5+0] = start[0];
@@ -239,10 +235,10 @@ float * calcRacePath(float *pylonStart, float *pylon1, float *pylon2){
     //Get Center1
     racePath[6*6+0] = pylon1[0];
     racePath[6*6+1] = pylon1[1];
-    racePath[6*6+2] = mission_parameters.min_alt+10;
+    racePath[6*6+2] = aal_parameters.alt_1;
     racePath[6*6+3] = pylon1[0];
     racePath[6*6+4] = pylon1[1];
-    racePath[6*6+5] = mission_parameters.min_alt+10;
+    racePath[6*6+5] = aal_parameters.alt_1;
 
     //Inter2a to Inter2b
     float * pylon1_to_pylon2_coeffArray = calculateLineCoeffs(pylon1[0],pylon2[0],pylon1[1],pylon2[1], true);
@@ -250,18 +246,18 @@ float * calcRacePath(float *pylonStart, float *pylon1, float *pylon2){
     float pylon1_to_pylon2_eCoeff = pylon1_to_pylon2_coeffArray[1];
     racePath[6*7+0] = pylon1[0]+radius*pylon1_to_pylon2_eCoeff;
     racePath[6*7+1] = pylon1[1]-radius*pylon1_to_pylon2_nCoeff;
-    racePath[6*7+2] = mission_parameters.min_alt+10;
+    racePath[6*7+2] = aal_parameters.alt_1;
     racePath[6*7+3] = pylon2[0]+radius*pylon1_to_pylon2_eCoeff;
     racePath[6*7+4] = pylon2[1]-radius*pylon1_to_pylon2_nCoeff;
-    racePath[6*7+5] = mission_parameters.min_alt+10;
+    racePath[6*7+5] = aal_parameters.alt_2;
 
     //Get Center2
     racePath[6*8+0] = pylon2[0];
     racePath[6*8+1] = pylon2[1];
-    racePath[6*8+2] = mission_parameters.min_alt+10;
+    racePath[6*8+2] = aal_parameters.alt_2;
     racePath[6*8+3] = pylon2[0];
     racePath[6*8+4] = pylon2[1];
-    racePath[6*8+5] = mission_parameters.min_alt+10;
+    racePath[6*8+5] = aal_parameters.alt_2;
 
     //Get Inter2 to end
     float endPoint[2];
@@ -276,34 +272,34 @@ float * calcRacePath(float *pylonStart, float *pylon1, float *pylon2){
     
     racePath[6*9+0] = endPoint[0]+sinf(target_angle_2)*end_to_inter2_dist;
     racePath[6*9+1] = endPoint[1]+cosf(target_angle_2)*end_to_inter2_dist;
-    racePath[6*9+2] = mission_parameters.min_alt+10;
+    racePath[6*9+2] = aal_parameters.alt_2;
     racePath[6*9+3] = endPoint[0];
     racePath[6*9+4] = endPoint[1];
-    racePath[6*9+5] = mission_parameters.min_alt+10;
+    racePath[6*9+5] = aal_parameters.alt_3;
 
     //End to PostEnd1
     racePath[6*10+0] = endPoint[0];
     racePath[6*10+1] = endPoint[1];
-    racePath[6*10+2] = mission_parameters.min_alt+10;
+    racePath[6*10+2] = aal_parameters.alt_3;
     racePath[6*10+3] = 160.0f;
     racePath[6*10+4] = -100.0f;
-    racePath[6*10+5] = mission_parameters.min_alt+10;
+    racePath[6*10+5] = aal_parameters.alt_3;
 
     //PostEnd1 to PostEnd2
     racePath[6*11+0] = 160.0f;
     racePath[6*11+1] = -100.0f;
-    racePath[6*11+2] = mission_parameters.min_alt+10;
+    racePath[6*11+2] = aal_parameters.alt_3;
     racePath[6*11+3] = 180.0f;
     racePath[6*11+4] = -80.0f;
-    racePath[6*11+5] = mission_parameters.min_alt+10;
+    racePath[6*11+5] = aal_parameters.alt_3;
 
     //PostEnd2 to PostEnd3
     racePath[6*12+0] = 180.0f;
     racePath[6*12+1] = -80.0f;
-    racePath[6*12+2] = mission_parameters.min_alt+10;
+    racePath[6*12+2] = aal_parameters.alt_3;
     racePath[6*12+3] = 160.0f;
     racePath[6*12+4] = -60.0f;
-    racePath[6*12+5] = mission_parameters.min_alt+10;
+    racePath[6*12+5] = aal_parameters.alt_3;
     
     return racePath;
 }
@@ -395,7 +391,6 @@ void mergeLineByEqn()
 {
     // defining a line
     float pointParamOnPlane=(nCoeff*(position_N - originN) + eCoeff*(position_E - originE))/float(pow(nCoeff,2.0f)+pow(eCoeff,2.0f));
-	
     
     // Need to get pointParamOnPlane
     float nDist = originN + nCoeff*pointParamOnPlane - position_N;
@@ -404,10 +399,20 @@ void mergeLineByEqn()
     float distBtwPlanes = sqrtf(pow(nDist,2) + pow(eDist,2));
     low_data.distBtwPlanes = distBtwPlanes;
 	
-	// getting percentage of the line traveled
-	float linePercent = getLinePercentage(pointParamOnPlane);
-	// get altitude desired based on the percentage
-	float altDesired = getLineAltDesired(linePercent);
+
+	// get altitude desired
+    float altDesired;
+    
+    if(low_data.line_index==5 || low_data.line_index==7){
+    //Going to Pylon1 or Pylon2
+        altDesired=getLineAltDesired(alt_climb_start,alt_climb_height,pointParamOnPlane);
+    }
+    else if(low_data.line_index==9){
+    //Going to End
+        altDesired=getLineAltDesired(0.0f,0.0f,pointParamOnPlane);
+    }else{
+        altDesired=endAlt;
+    }
 	
 	//dT = 1/(distBtwPlanes+aal_parameters.manualDT);
     float dT;
@@ -432,27 +437,18 @@ void mergeLineByEqn()
  */
 void mergeCircleByEqn()
 {
-    if(high_data.radius_control_mode <= 1.0f){
-        // defining a line from plane to circle center
-        float * plane_to_center_coeffArray = calculateLineCoeffs(position_N, centerN, position_E, centerE,true);
-        float plane_to_center_nCoeff = plane_to_center_coeffArray[0];
-        float plane_to_center_eCoeff = plane_to_center_coeffArray[1];
-		
-        //Get Perpindicular
-        nCoeff = plane_to_center_eCoeff;
-        eCoeff = -plane_to_center_nCoeff;
+    // defining a line from plane to circle center
+    float * plane_to_center_coeffArray = calculateLineCoeffs(position_N, centerN, position_E, centerE,true);
+    float plane_to_center_nCoeff = plane_to_center_coeffArray[0];
+    float plane_to_center_eCoeff = plane_to_center_coeffArray[1];
+	
+    //Get Perpindicular
+    nCoeff = plane_to_center_eCoeff;
+    eCoeff = -plane_to_center_nCoeff;
 
-        low_data.next_N = position_N + nCoeff;
-        low_data.next_E = position_E + eCoeff;
-        low_data.next_Alt = endAlt;
-    }
-    else{
-        float angle = atan2(position_N-centerN, position_E-centerE);
-        low_data.next_N = centerN + aal_parameters.target_radius*sinf(angle-aal_parameters.dTheta);
-        low_data.next_E = centerE + aal_parameters.target_radius*cosf(angle-aal_parameters.dTheta);
-        low_data.next_Alt = endAlt;
-    }
-    
+    low_data.next_N = position_N + nCoeff;
+    low_data.next_E = position_E + eCoeff;
+    low_data.next_Alt = endAlt;
 }
 
 /**
@@ -519,9 +515,8 @@ bool transitionLine(){
 }
 
 void updateLineParameters(){
-    originN = lineStartingPoints[low_data.line_index*6];
-    originE = lineStartingPoints[low_data.line_index*6+1];
-    
+    originN = position_N;//lineStartingPoints[low_data.line_index*6];
+    originE = position_E;//lineStartingPoints[low_data.line_index*6+1];
 	startAlt = -position_D_gps;
 	
     endN    = lineStartingPoints[low_data.line_index*6+3];
