@@ -90,13 +90,13 @@ void pitch_control(float pitch_desired){
 }
 
 void altitude_control_circle(float altitude_desired){
-	float delta_altitude = altitude_desired - (-position_D_gps);
+	float delta_altitude = altitude_desired + position_D_gps;
 	float roll_desired = aah_parameters.proportional_altitude_gain_circle*delta_altitude +
 						 aah_parameters.derivative_altitude_gain_circle*vel_D +
 						 aah_parameters.circle_roll_trim;
 
 	roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0, aah_parameters.roll_lim*PI_F/180.0);
-	high_data.target_roll = math::constrain(roll_desired, -aah_parameters.roll_lim, aah_parameters.roll_lim);
+	high_data.target_roll = math::constrain(roll_desired*180.0/PI_F, -aah_parameters.roll_lim, aah_parameters.roll_lim);
 	roll_control(roll_desired);
 }
 
@@ -127,12 +127,11 @@ void yaw_control_circle(float yaw_desired){
 	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
 	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
 
-
 	float pitch_desired = delta_yaw*aah_parameters.proportional_yaw_gain_circle +
 			              yaw_rate*aah_parameters.derivative_yaw_gain_circle +
 				          aah_parameters.circle_pitch_trim;
-	pitch_desired = math::constrain(pitch_desired, -abs(aah_parameters.pitch_maxmin_circle,
-														abs(aah_parameters.pitch_maxmin_circle)));
+	pitch_desired = math::constrain(pitch_desired, -abs(aah_parameters.pitch_maxmin_circle)*PI_F/180.0f,
+									abs(aah_parameters.pitch_maxmin_circle)*PI_F/180.0f);
 	pitch_control(pitch_desired);
 }
 
@@ -152,7 +151,7 @@ void yaw_control(float yaw_desired){
 
     high_data.target_roll = math::constrain(roll_desired, -aah_parameters.roll_lim, aah_parameters.roll_lim);
 
-    roll_control(math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180, aah_parameters.roll_lim*PI_F/180));
+    roll_control(math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, aah_parameters.roll_lim*PI_F/180.0f));
 }
 
 void rudder_control(bool isLine){
@@ -170,15 +169,15 @@ float getMissionYaw(){
 
 
 void radius_control(){
-	float yaw_perp = getMissionYaw();
 	float delta_east = position_E-low_data.centerE;
 	float delta_north = position_N-low_data.centerN;
 	float distance_to_center = sqrtf(pow(delta_east,2)+pow(delta_north,2));
 	float delta_radius = distance_to_center-low_data.radius;
-	float delta_radius_derivative = (vel_N*delta_north+ vel_E*delta_east)/distance_to_center;
+	float delta_radius_derivative = (vel_N*delta_north + vel_E*delta_east)/distance_to_center;
 	float delta_yaw = aah_parameters.proportional_radius_gain_circle*delta_radius +
 					  aah_parameters.derivative_radius_gain_circle*delta_radius_derivative;
 	delta_yaw = math::constrain(delta_yaw, -PI_F*0.5f,PI_F*0.5f);
+	float yaw_perp = getMissionYaw();
 	float yaw_desired = yaw_perp+delta_yaw;
 	yaw_control_circle(yaw_desired);
 }
