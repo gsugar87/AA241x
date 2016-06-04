@@ -63,7 +63,7 @@
 // list of variable names
 #define HIGH_FIELD1 target_yaw;		/**< change variable_name1 to the desired variable name */
 #define HIGH_FIELD2 target_roll;
-#define HIGH_FIELD3 variable_name3;
+#define HIGH_FIELD3 target_pitch;
 #define HIGH_FIELD4 d_alt;
 #define HIGH_FIELD5 d_pit;
 #define HIGH_FIELD6 test_case;

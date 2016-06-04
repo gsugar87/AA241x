@@ -82,7 +82,6 @@ void pitch_control(float pitch_desired){
 	float delta_pitch = pitch_desired - pitch;
     float elevator_desired = (aah_parameters.proportional_pitch_gain)*(delta_pitch);
     elevator_desired+=aah_parameters.elevator_trim;
-
     elevator_desired+=aah_parameters.derivative_pitch_gain*(-pitch_rate);
 	
 	if(aah_parameters.invert_ele_servo>0)	{pitch_servo_out =  math::constrain(elevator_desired, -1.0f, 1.0f);}
@@ -94,27 +93,25 @@ void altitude_control_circle(float altitude_desired){
 	float roll_desired = aah_parameters.proportional_altitude_gain_circle*delta_altitude +
 						 aah_parameters.derivative_altitude_gain_circle*vel_D +
 						 aah_parameters.circle_roll_trim;
-
 	roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, aah_parameters.roll_lim*PI_F/180.0f);
-	high_data.target_roll = math::constrain(roll_desired*180.0f/PI_F, -aah_parameters.roll_lim, aah_parameters.roll_lim);
+	high_data.target_roll = roll_desired*180.0f/PI_F;
 	roll_control(roll_desired);
 }
 
 void altitude_control(float altitude_desired){
 	float delta_altitude = altitude_desired - (-position_D_gps);
-    float pitch_desired = aah_parameters.proportional_altitude_gain*(delta_altitude);
-
-	pitch_desired+=aah_parameters.derivative_altitude_gain*(vel_D);
-
-    pitch_control(math::constrain(pitch_desired, -PI_F*5.0f/18.0f, PI_F*5.0f/18.0f));
+    float pitch_desired = 	aah_parameters.proportional_altitude_gain*delta_altitude +
+							aah_parameters.derivative_altitude_gain*vel_D;
+	pitch_desired = math::constrain(pitch_desired, -PI_F*5.0f/18.0f, PI_F*5.0f/18.0f)
+	high_data.target_pitch = pitch_desired*180.0f/PI_F;
+    pitch_control(pitch_desired);
 }
 
 void roll_control(float roll_desired){
 	float delta_roll = roll_desired - roll;
-    float aileron_desired = aah_parameters.proportional_roll_gain*(delta_roll);
-    aileron_desired+=aah_parameters.aileron_trim;
-
-	aileron_desired+=aah_parameters.derivative_roll_gain*(-roll_rate);
+    float aileron_desired = aah_parameters.proportional_roll_gain*(delta_roll) +
+							aah_parameters.derivative_roll_gain*(-roll_rate) + 
+							aah_parameters.aileron_trim;
   	
   	if(aah_parameters.invert_ail_servo>0)	{roll_servo_out =  math::constrain(aileron_desired, -1.0f, 1.0f);}
 	else 									{roll_servo_out = -math::constrain(aileron_desired, -1.0f, 1.0f);}
@@ -125,11 +122,12 @@ void yaw_control_circle(float yaw_desired){
 	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
 	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
 
-	float pitch_desired = delta_yaw*aah_parameters.proportional_yaw_gain_circle +
-			              yaw_rate*aah_parameters.derivative_yaw_gain_circle +
+	float pitch_desired = aah_parameters.proportional_yaw_gain_circle*delta_yaw +
+			              aah_parameters.derivative_yaw_gain_circle*(-yaw_rate) +
 				          aah_parameters.circle_pitch_trim;
 	pitch_desired = math::constrain(pitch_desired, -abs(aah_parameters.pitch_maxmin_circle)*PI_F/180.0f,
 									abs(aah_parameters.pitch_maxmin_circle)*PI_F/180.0f);
+	high_data.target_pitch = pitch_desired*180.0f/PI_F;
 	pitch_control(pitch_desired);
 }
 
@@ -138,13 +136,12 @@ void yaw_control(float yaw_desired){
 	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
 	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
 
-	float roll_desired = aah_parameters.proportional_yaw_gain*(delta_yaw);
-    
-    roll_desired += aah_parameters.derivative_yaw_gain*(-yaw_rate);
-
-    high_data.target_roll = math::constrain(roll_desired, -aah_parameters.roll_lim, aah_parameters.roll_lim);
-
-    roll_control(math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, aah_parameters.roll_lim*PI_F/180.0f));
+	float roll_desired = 	aah_parameters.proportional_yaw_gain*delta_yaw +
+							aah_parameters.derivative_yaw_gain*(-yaw_rate);
+    roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, 
+    								aah_parameters.roll_lim*PI_F/180.0f);
+	high_data.target_roll = roll_desired*180.0f/PI_F;
+    roll_control(roll_desired);
 }
 
 void rudder_control_circle(){
