@@ -67,72 +67,31 @@ float dt = 0.0f;
 
 const float PI_F = 4.0f*atanf(1.0f);
 
-void velocity_control(){
-	if(low_data.isLine){
-		if(aah_parameters.throttle_line > 1.0f){throttle_servo_out =  last_man_throttle_in;}
-		else 								   {throttle_servo_out =  aah_parameters.throttle_line;}
-	}
-	else{
-		if(aah_parameters.throttle_circle > 1.0f){throttle_servo_out =  last_man_throttle_in;}
-		else 									 {throttle_servo_out =  aah_parameters.throttle_circle;}
-	}
+void velocity_control_line(){
+	if(aah_parameters.throttle_line > 1.0f){throttle_servo_out =  last_man_throttle_in;}
+	else 								   {throttle_servo_out =  aah_parameters.throttle_line;}
 }
 
-void pitch_control(float pitch_desired){
+void pitch_control_line(float pitch_desired){
 	float delta_pitch = pitch_desired - pitch;
-    float elevator_desired = (aah_parameters.proportional_pitch_gain)*(delta_pitch);
-    elevator_desired+=aah_parameters.elevator_trim;
-    elevator_desired+=aah_parameters.derivative_pitch_gain*(-pitch_rate);
+    float elevator_desired = aah_parameters.proportional_pitch_gain*delta_pitch +
+    						 aah_parameters.elevator_trim +
+    						 aah_parameters.derivative_pitch_gain*(-pitch_rate);
 	
 	if(aah_parameters.invert_ele_servo>0)	{pitch_servo_out =  math::constrain(elevator_desired, -1.0f, 1.0f);}
 	else 									{pitch_servo_out = -math::constrain(elevator_desired, -1.0f, 1.0f);}
 }
 
-void altitude_control_circle(float altitude_desired){
-	float delta_altitude = altitude_desired + position_D_gps;
-	float roll_desired = aah_parameters.proportional_altitude_gain_circle*delta_altitude +
-						 aah_parameters.derivative_altitude_gain_circle*vel_D +
-						 aah_parameters.circle_roll_trim;
-	roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, aah_parameters.roll_lim*PI_F/180.0f);
-	high_data.target_roll = roll_desired*180.0f/PI_F;
-	roll_control(roll_desired);
-}
-
-void altitude_control(float altitude_desired){
+void altitude_control_line(float altitude_desired){
 	float delta_altitude = altitude_desired - (-position_D_gps);
     float pitch_desired = 	aah_parameters.proportional_altitude_gain*delta_altitude +
 							aah_parameters.derivative_altitude_gain*vel_D;
 	pitch_desired = math::constrain(pitch_desired, -PI_F*5.0f/18.0f, PI_F*5.0f/18.0f);
-	high_data.target_pitch = pitch_desired*180.0f/PI_F;
-    pitch_control(pitch_desired);
+	high_data.target_pitch = pitch_desired;
+    pitch_control_line(pitch_desired);
 }
 
-void roll_control(float roll_desired){
-	float delta_roll = roll_desired - roll;
-    float aileron_desired = aah_parameters.proportional_roll_gain*(delta_roll) +
-							aah_parameters.derivative_roll_gain*(-roll_rate) + 
-							aah_parameters.aileron_trim;
-  	
-  	if(aah_parameters.invert_ail_servo>0)	{roll_servo_out =  math::constrain(aileron_desired, -1.0f, 1.0f);}
-	else 									{roll_servo_out = -math::constrain(aileron_desired, -1.0f, 1.0f);}
-}
-
-void yaw_control_circle(float yaw_desired){
-	high_data.target_yaw = yaw_desired;
-	float delta_yaw = yaw_desired - yaw;
-	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
-	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
-
-	float pitch_desired = aah_parameters.proportional_yaw_gain_circle*delta_yaw +
-			              aah_parameters.derivative_yaw_gain_circle*(-yaw_rate) +
-				          aah_parameters.circle_pitch_trim;
-	pitch_desired = math::constrain(pitch_desired, -abs(aah_parameters.pitch_maxmin_circle)*PI_F/180.0f,
-									abs(aah_parameters.pitch_maxmin_circle)*PI_F/180.0f);
-	high_data.target_pitch = pitch_desired*180.0f/PI_F;
-	pitch_control(pitch_desired);
-}
-
-void yaw_control(float yaw_desired){
+void yaw_control_line(float yaw_desired){
 	high_data.target_yaw = yaw_desired;
 	float delta_yaw = yaw_desired - yaw;
 	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
@@ -142,8 +101,65 @@ void yaw_control(float yaw_desired){
 							aah_parameters.derivative_yaw_gain*(-yaw_rate);
     roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, 
     								aah_parameters.roll_lim*PI_F/180.0f);
-	high_data.target_roll = roll_desired*180.0f/PI_F;
+	high_data.target_roll = roll_desired;
     roll_control(roll_desired);
+}
+
+void rudder_control_line(){
+	yaw_servo_out = 0;
+}
+
+void line_control(){
+	velocity_control_line();
+	altitude_control_line(low_data.next_Alt);
+	rudder_control_line();
+	if(low_data.race_complete<=0.0f){
+		yaw_desired = getMissionYaw();
+	}
+	yaw_control_line(yaw_desired);
+}
+
+
+
+
+void velocity_control_circle(){
+	if(aah_parameters.throttle_circle > 1.0f){throttle_servo_out =  last_man_throttle_in;}
+	else 									 {throttle_servo_out =  aah_parameters.throttle_circle;}
+}
+
+void pitch_control_circle(float pitch_desired){
+	float delta_pitch = pitch_desired - pitch;
+    float roll_desired = aah_parameters.proportional_pitch_gain_circle*delta_pitch + 
+    					 aah_parameters.derivative_pitch_gain_circle*(-pitch_rate) +
+    					 aah_parameters.circle_roll_trim*PI_F/180.0f;
+	roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, 
+    								aah_parameters.roll_lim*PI_F/180.0f);
+	high_data.target_roll = roll_desired;
+	roll_control(roll_desired);
+}
+
+void altitude_control_circle(float altitude_desired){
+	float delta_altitude = altitude_desired - (-position_D_gps);
+	float pitch_desired = aah_parameters.proportional_altitude_gain_circle*delta_altitude +
+						  aah_parameters.derivative_altitude_gain_circle*vel_D;
+	pitch_desired = math::constrain(pitch_desired, -aah_parameters.pitch_maxmin_circle*PI_F/180.0f, 
+									 aah_parameters.pitch_maxmin_circle*PI_F/180.0f);
+	high_data.target_pitch= pitch_desired;
+	pitch_control_circle(pitch_desired);
+}
+
+void yaw_control_circle(float yaw_desired){
+	high_data.target_yaw = yaw_desired;
+	float delta_yaw = yaw_desired - yaw;
+	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
+	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
+
+	float elevator_desired = aah_parameters.proportional_yaw_gain_circle*delta_yaw +
+			              	 aah_parameters.derivative_yaw_gain_circle*(-yaw_rate) +
+				          	 aah_parameters.circle_elev_trim;
+
+	if(aah_parameters.invert_ele_servo>0)	{pitch_servo_out =  math::constrain(elevator_desired, -1.0f, 1.0f);}
+	else 									{pitch_servo_out = -math::constrain(elevator_desired, -1.0f, 1.0f);}
 }
 
 void rudder_control_circle(){
@@ -151,8 +167,13 @@ void rudder_control_circle(){
 	else 									{yaw_servo_out = -math::constrain(aah_parameters.proportional_rudder_gain*sinf(roll), -1.0f, 1.0f);}
 }
 
-void rudder_control_line(){
-	yaw_servo_out = 0;
+void roll_control(float roll_desired){
+	float delta_roll = roll_desired - roll;
+    float aileron_desired = aah_parameters.proportional_roll_gain*delta_roll +
+							aah_parameters.derivative_roll_gain*(-roll_rate) + 
+							aah_parameters.aileron_trim;
+  	if(aah_parameters.invert_ail_servo>0)	{roll_servo_out =  math::constrain(aileron_desired, -1.0f, 1.0f);}
+	else 									{roll_servo_out = -math::constrain(aileron_desired, -1.0f, 1.0f);}
 }
 
 float getMissionYaw(){
@@ -174,24 +195,7 @@ void radius_control(){
 	yaw_control_circle(yaw_desired);
 }
 
-//void radius_control(float yaw_perp){
-//	float delta_dist = sqrtf(pow((low_data.centerE-position_E),2)+pow((low_data.centerN-position_N),2))-low_data.radius;
-//	float yaw_desired = yaw_perp + math::constrain(delta_dist*aah_parameters.proportional_rad_err_gain, -PI_F*.5f,PI_F*.5f);
-//
-//	if(yaw_desired >= PI_F)			{yaw_desired -= 2.0f*PI_F;}
-//	else if(yaw_desired <= -PI_F)	{yaw_desired += 2.0f*PI_F;}
-//	yaw_control(yaw_desired);
-//}
-//
-//void radius_control_with_roll(){
-//	float delta_dist = sqrtf(pow((low_data.centerE-position_E),2)+pow((low_data.centerN-position_N),2))-low_data.radius;
-//
-//	float velocity_filtered = sqrtf(pow(vel_N,2) + pow(vel_E,2));
-//	float roll_desired =delta_dist*aah_parameters.proportional_rad_err_gain+float(atan2(pow(velocity_filtered,2),(low_data.radius*9.81f)));
-//	if(roll_desired >= PI_F)		{roll_desired -= 2.0f*PI_F;}
-//	else if(roll_desired <= -PI_F)	{roll_desired += 2.0f*PI_F;}
-//	roll_control(math::constrain(roll_desired, -aah_parameters.roll_lim, aah_parameters.roll_lim));
-//}
+
 
 void flight_control() {
 	dt = hrt_absolute_time() - previous_loop_timestamp;
@@ -199,7 +203,11 @@ void flight_control() {
 																	 //	should only occur on first engagement since this is 59Hz loop
 		//yaw_desired = yaw; 							// yaw_desired already defined in aa241x_high_aux.h
 		// float altitude_desired = position_D_baro; 		// altitude_desired needs to be declared
-		altitude_desired = (-position_D_gps);
+		if(aah_parameters.command_alt<=0){
+			altitude_desired = (-position_D_gps);
+		}else{
+			altitude_desired = aah_parameters.command_alt;
+		}
         velocity_desired = ground_speed;
         yaw_desired = yaw;
 
@@ -209,22 +217,17 @@ void flight_control() {
 
 	// TODO: write all of your flight control here...
 	high_data.test_case=aah_parameters.test_case;
-	high_data.command_altitude = aah_parameters.command_alt;
+	high_data.command_altitude = altitude_desired;
 	//Step into to altitude
 	if(aah_parameters.test_case<=0.0f){
-        velocity_control();
-        if(aah_parameters.command_alt<=0.0f){
-	        altitude_control(altitude_desired);
-    	}else{
-    		altitude_control(aah_parameters.command_alt);
-    	}
-
+        velocity_control_line();
+        altitude_control_line(altitude_desired);
 		roll_control(man_roll_in*PI_F*.5f);
 		yaw_servo_out = man_yaw_in;
 	}
 	//Auto-Velocity
 	else if(aah_parameters.test_case<=1.0f){
-        velocity_control();
+        velocity_control_line();
         pitch_servo_out = -man_pitch_in;
 		roll_servo_out = man_roll_in;
 		yaw_servo_out = man_yaw_in;
@@ -232,14 +235,14 @@ void flight_control() {
 	//Auto-Pitch
 	else if(aah_parameters.test_case<=2.0f){
         throttle_servo_out = man_throttle_in;
-        pitch_control(man_pitch_in*PI_F*.5f);
+        pitch_control_line(man_pitch_in*PI_F*.5f);
 		roll_servo_out = man_roll_in;
 		yaw_servo_out = man_yaw_in;
 	}
 	//Auto-Altitude
 	else if(aah_parameters.test_case<=3.0f){
-        velocity_control();
-        altitude_control(altitude_desired);
+        velocity_control_line();
+        altitude_control_line(altitude_desired);
 		roll_servo_out = man_roll_in;
 		yaw_servo_out = man_yaw_in;
 	}
@@ -254,14 +257,14 @@ void flight_control() {
 	else if(aah_parameters.test_case<=5.0f){
         throttle_servo_out = man_throttle_in;
         pitch_servo_out = -man_pitch_in;
-		yaw_control(yaw_desired);
+		yaw_control_line(yaw_desired);
 		yaw_servo_out = man_yaw_in;
 	}
 	//Set-Yaw
 	else if(aah_parameters.test_case<=6.0f){
         throttle_servo_out = man_throttle_in;
 		pitch_servo_out = -man_pitch_in;
-        yaw_control(aah_parameters.set_yaw);
+        yaw_control_line(aah_parameters.set_yaw);
 		yaw_servo_out = man_yaw_in;
 	}
 	//Auto-Rudder
@@ -271,20 +274,56 @@ void flight_control() {
         pitch_servo_out = -man_pitch_in;
         rudder_control_circle();
 	}
-	//FULL MISSION
-	else{
-		velocity_control();
+
+	//Circle Following Tests
+	//Manual Roll, Auto Radius, Tweek Radius and Yaw Params
+	else if(aah_parameters.test_case<=8.0f){
 		if (low_data.isLine){
 			// We are in a Line
-			altitude_control(low_data.next_Alt);
-			rudder_control_line();
-			if(low_data.race_complete<=0.0f){
-				yaw_desired = getMissionYaw();
-			}
-			yaw_control(yaw_desired);
+			line_control();
+		}
+		else{
+			velocity_control_circle();
+			rudder_control_circle();
+			roll_control(man_roll_in*PI_F*.5f);
+			radius_control();
+		}
+	}
+	//Manual Pitch, Auto Radius, Tweek Pitch Params
+	else if(aah_parameters.test_case<=9.0f){
+		if (low_data.isLine){
+			// We are in a Line
+			line_control();
+		}
+		else{
+			velocity_control_circle();
+			rudder_control_circle();
+			pitch_control_circle(man_pitch_in*PI_F*.5f);
+			radius_control();
+		}
+	}
+	//Auto 
+	else if(aah_parameters.test_case<=10.0f){
+		if (low_data.isLine){
+			// We are in a Line
+			line_control();
+		}
+		else{
+			velocity_control_circle();
+			rudder_control_circle();
+			altitude_control_circle(altitude_desired);
+			radius_control();
+		}
+	}
+	//FULL MISSION
+	else{
+		if (low_data.isLine){
+			// We are in a Line
+			line_control();
 		}
 		else{
 			// We are in a Circle
+			velocity_control_circle();
 			rudder_control_circle();
 			altitude_control_circle(low_data.next_Alt);
 			radius_control();

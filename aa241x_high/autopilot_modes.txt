@@ -1,12 +1,14 @@
 Autopilot Modes:
 
-0 - Full Autopilot
-1 - Velocity
-2 - Pitch
-3 - Altitude
-4 - Roll
-5 - Yaw
-6 - Get Yaw
-7 - Rudder
-8 - Mission
-9 - Manual
+0 - Altitude Step
+1 - Auto Velocity
+2 - Auto Pitch
+3 - Auto Altitude
+4 - Auto Roll
+5 - Auto Yaw
+6 - Yaw Step
+7 - Auto Rudder Circle
+8 - Auto Radius, Control Roll  (MAKE SURE YOUR PATH has a circle)
+9 - Auto Radius, Control Pitch (MAKE SURE YOUR PATH has a circle)
+10 - Auto Radius, Auto Altitude (MAKE SURE YOUR PATH has a circle)
+11 - Full Mission

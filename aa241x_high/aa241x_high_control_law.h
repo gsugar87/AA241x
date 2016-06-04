@@ -61,22 +61,23 @@
 #include <mathlib/mathlib.h>
 
 // TODO: write your function prototypes here
-void velocity_control();
-void pitch_control(float pitch_desired);
-void roll_control(float roll_desired);
 
-void altitude_control(float altitude_desired);
+void velocity_control_line();
+void pitch_control_line(float pitch_desired);
+void altitude_control_line(float altitude_desired);
+void yaw_control_line(float yaw_desired);
+void rudder_control_line();
+void line_control();
+
+void velocity_control_circle();
+void pitch_control_circle(float pitch_desired);
 void altitude_control_circle(float altitude_desired);
-
-void yaw_control(float yaw_desired);
 void yaw_control_circle(float yaw_desired);
-
+void rudder_control_circle();
 void radius_control();
 
-void rudder_control_circle();
-void rudder_control_line();
+void roll_control(float roll_desired);
 
-void radius_control_with_roll();
 float getMissionYaw();
 
 #endif /* AA241X_FW_CONTROL_MAIN_H_ */
