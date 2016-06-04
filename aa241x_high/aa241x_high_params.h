@@ -97,6 +97,7 @@ struct aah_params {
 	float radius_control_by_roll;
 	float command_alt;
 	float circle_roll_trim;
+	float circle_pitch_trim;
 };
 
 
@@ -150,6 +151,7 @@ struct aah_param_handles {
 	param_t command_alt;
 	
 	param_t circle_roll_trim;
+	param_t circle_pitch_trim;
 };
 
 /**
