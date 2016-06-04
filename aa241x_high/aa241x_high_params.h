@@ -69,7 +69,6 @@ struct aah_params {
 	float proportional_altitude_gain_cicle;
 
 	float proportional_yaw_gain;
-	float proportional_yaw_gain_circle;
 	float derivative_yaw_gain;
 
 	float proportional_roll_gain;
@@ -132,7 +131,6 @@ struct aah_param_handles {
 	param_t proportional_altitude_gain_cicle;
 
 	param_t proportional_yaw_gain;
-	param_t proportional_yaw_gain_circle;
 	param_t derivative_yaw_gain;
 
 	param_t proportional_roll_gain;

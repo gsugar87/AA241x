@@ -192,7 +192,6 @@ int aah_parameters_update(const struct aah_param_handles *h, struct aah_params *
 	param_get(h->derivative_pitch_gain,      &(p->derivative_pitch_gain));
 
 	param_get(h->proportional_yaw_gain,      &(p->proportional_yaw_gain));
-	param_get(h->proportional_yaw_gain_circle,&(p->proportional_yaw_gain_circle));
 	param_get(h->derivative_yaw_gain,      	 &(p->derivative_yaw_gain));
 	
 	param_get(h->proportional_roll_gain,     &(p->proportional_roll_gain));
