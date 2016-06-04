@@ -131,7 +131,6 @@ int aah_parameters_init(struct aah_param_handles *h)
 
 
 	h->proportional_yaw_gain 		= param_find("AAH_K_YAW_P");
-	h->proportional_yaw_gain_circle = param_find("AAH_K_YAWC_P");
 	h->derivative_yaw_gain 			= param_find("AAH_K_YAW_D");
 
 	h->proportional_roll_gain 		= param_find("AAH_K_ROLL_P");

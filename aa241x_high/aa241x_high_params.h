@@ -105,6 +105,7 @@ struct aah_params {
 	float proportional_radius_gain_circle;
 	float derivative_yaw_gain_circle;
 	float proportional_yaw_gain_circle;
+
 	
 	float pitch_maxmin_circle;
 	float delta_yaw_maxmin_circle;
