@@ -95,8 +95,8 @@ void altitude_control_circle(float altitude_desired){
 						 aah_parameters.derivative_altitude_gain_circle*vel_D +
 						 aah_parameters.circle_roll_trim;
 
-	roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0, aah_parameters.roll_lim*PI_F/180.0);
-	high_data.target_roll = math::constrain(roll_desired*180.0/PI_F, -aah_parameters.roll_lim, aah_parameters.roll_lim);
+	roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, aah_parameters.roll_lim*PI_F/180.0f);
+	high_data.target_roll = math::constrain(roll_desired*180.0f/PI_F, -aah_parameters.roll_lim, aah_parameters.roll_lim);
 	roll_control(roll_desired);
 }
 
@@ -152,15 +152,6 @@ void yaw_control(float yaw_desired){
     high_data.target_roll = math::constrain(roll_desired, -aah_parameters.roll_lim, aah_parameters.roll_lim);
 
     roll_control(math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0f, aah_parameters.roll_lim*PI_F/180.0f));
-}
-
-void rudder_control(bool isLine){
-	if(isLine){
-		yaw_servo_out = 0;
-	}else{
-		if(aah_parameters.invert_rud_servo>0)	{yaw_servo_out =  math::constrain(aah_parameters.proportional_rudder_gain*sinf(roll), -1.0f, 1.0f);}
-		else 									{yaw_servo_out = -math::constrain(aah_parameters.proportional_rudder_gain*sinf(roll), -1.0f, 1.0f);}
-	}
 }
 
 void rudder_control_circle(){
@@ -287,7 +278,7 @@ void flight_control() {
 		throttle_servo_out = man_throttle_in;
 		roll_servo_out = man_roll_in;
         pitch_servo_out = -man_pitch_in;
-        rudder_control(false);
+        rudder_control_circle();
 	}
 	//FULL MISSION
 	else{

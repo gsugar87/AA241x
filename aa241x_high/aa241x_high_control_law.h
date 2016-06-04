@@ -63,11 +63,18 @@
 // TODO: write your function prototypes here
 void velocity_control();
 void pitch_control(float pitch_desired);
-void altitude_control(float altitude_desired);
 void roll_control(float roll_desired);
+
+void altitude_control(float altitude_desired);
+void altitude_control_circle(float altitude_desired);
+
 void yaw_control(float yaw_desired);
-void radius_control(float yaw_perp);
-void rudder_control(bool isLine);
+void yaw_control_circle(float yaw_desired);
+
+void radius_control();
+
+void rudder_control_circle();
+void rudder_control_line();
 
 void radius_control_with_roll();
 float getMissionYaw();

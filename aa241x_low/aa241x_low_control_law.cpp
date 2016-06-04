@@ -86,25 +86,12 @@ int n_numOfPts;
 
 int currentTurn = 0;
 
-
-
-float getLinePercentage(float lengthTraveled){
-	if(isLinePts[low_data.line_index]){
-		float lineLength = findDist3D(originN, endN, originE, endE);
-		return lengthTraveled/lineLength*100.0f;
-	}
-	else{
-		return 0.0f;
-	}
-}
-
 float getLineAltDesired(float alt_climb_start, float alt_climb_height, float start_to_plane_dist){
     
 	float altDesired;
-    float percentage_start = aal_parameters.alt_climb_start;
     //Climb down if far from pylon
-    float plane_to_pylon_dist = findDist3D(position_N, endN, position_E, endE)
-    float start_to_pylon_dist = findDist3D(originN, endN, originE, endE)
+    float plane_to_pylon_dist = findDist3D(position_N, endN, position_E, endE);
+    float start_to_pylon_dist = findDist3D(originN, endN, originE, endE);
     if(plane_to_pylon_dist > alt_climb_start || alt_climb_start <= 0.0f){
         //Linear
         float first_section_dist = start_to_pylon_dist-alt_climb_start;
@@ -405,7 +392,7 @@ void mergeLineByEqn()
     
     if(low_data.line_index==5 || low_data.line_index==7){
     //Going to Pylon1 or Pylon2
-        altDesired=getLineAltDesired(alt_climb_start,alt_climb_height,pointParamOnPlane);
+        altDesired=getLineAltDesired(aal_parameters.alt_climb_start,aal_parameters.alt_climb_height,pointParamOnPlane);
     }
     else if(low_data.line_index==9){
     //Going to End
