@@ -105,8 +105,6 @@ void altitude_control(float altitude_desired){
     float pitch_desired = aah_parameters.proportional_altitude_gain*(delta_altitude);
 
 	pitch_desired+=aah_parameters.derivative_altitude_gain*(vel_D);
-	
-	pitch_desired+=aah_parameters.proportional_altitude_gain_cicle*sinf(roll);
 
     pitch_control(math::constrain(pitch_desired, -PI_F*5.0f/18.0f, PI_F*5.0f/18.0f));
 }
@@ -139,13 +137,8 @@ void yaw_control(float yaw_desired){
 	float delta_yaw = yaw_desired - yaw;
 	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
 	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
-	float roll_desired;
 
-	if(low_data.isLine){
-	 	roll_desired = aah_parameters.proportional_yaw_gain*(delta_yaw);
-	}else{
-		roll_desired = aah_parameters.proportional_yaw_gain_circle*(delta_yaw);
-	}
+	float roll_desired = aah_parameters.proportional_yaw_gain*(delta_yaw);
     
     roll_desired += aah_parameters.derivative_yaw_gain*(-yaw_rate);
 
@@ -162,7 +155,6 @@ void rudder_control_circle(){
 void rudder_control_line(){
 	yaw_servo_out = 0;
 }
-
 
 float getMissionYaw(){
 	return atan2(low_data.next_E-position_E,low_data.next_N-position_N);

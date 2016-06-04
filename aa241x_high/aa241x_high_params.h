@@ -66,7 +66,6 @@ struct aah_params {
 	
 	float proportional_altitude_gain;
 	float derivative_altitude_gain;
-	float proportional_altitude_gain_cicle;
 
 	float proportional_yaw_gain;
 	float derivative_yaw_gain;
@@ -76,8 +75,6 @@ struct aah_params {
 	float roll_lim;
 
 	float proportional_rudder_gain;
-
-	float proportional_rad_err_gain;
 
 	float throttle_line;
 	float throttle_circle;
@@ -93,8 +90,9 @@ struct aah_params {
 	float invert_ail_servo;
 	float invert_rud_servo;
 	float invert_ele_servo;
-	float radius_control_by_roll;
+
 	float command_alt;
+
 	float circle_roll_trim;
 	float circle_pitch_trim;
 	
@@ -104,7 +102,6 @@ struct aah_params {
 	float proportional_radius_gain_circle;
 	float derivative_yaw_gain_circle;
 	float proportional_yaw_gain_circle;
-
 	
 	float pitch_maxmin_circle;
 	float delta_yaw_maxmin_circle;
@@ -128,7 +125,6 @@ struct aah_param_handles {
 
 	param_t proportional_altitude_gain;
 	param_t derivative_altitude_gain;
-	param_t proportional_altitude_gain_cicle;
 
 	param_t proportional_yaw_gain;
 	param_t derivative_yaw_gain;
@@ -138,8 +134,6 @@ struct aah_param_handles {
 	param_t roll_lim;
 	
 	param_t proportional_rudder_gain;
-
-	param_t proportional_rad_err_gain;
 
 	param_t throttle_line;
 	param_t throttle_circle;
@@ -156,7 +150,6 @@ struct aah_param_handles {
 	param_t invert_rud_servo;
 	param_t invert_ele_servo;
 	
-	param_t radius_control_by_roll;
 	param_t command_alt;
 	
 	param_t circle_roll_trim;

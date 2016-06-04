@@ -65,13 +65,11 @@
 // TODO: define custom parameters here
 PARAM_DEFINE_FLOAT(AAH_K_ALT_P, 0.25f);
 PARAM_DEFINE_FLOAT(AAH_K_ALT_D, 0.025f);
-PARAM_DEFINE_FLOAT(AAH_K_ALT_CIR, 0.0f);
 
 PARAM_DEFINE_FLOAT(AAH_K_PIT_P, 0.7f);
 PARAM_DEFINE_FLOAT(AAH_K_PIT_D, 0.0f);
 
 PARAM_DEFINE_FLOAT(AAH_K_YAW_P, 1.6f);
-PARAM_DEFINE_FLOAT(AAH_K_YAWC_P, 0.7f);
 PARAM_DEFINE_FLOAT(AAH_K_YAW_D, 0.18f);
 
 PARAM_DEFINE_FLOAT(AAH_K_ROLL_P, 0.5f);
@@ -79,8 +77,6 @@ PARAM_DEFINE_FLOAT(AAH_K_ROLL_D, 0.0f);
 PARAM_DEFINE_FLOAT(AAH_ROLL_LIM, 70.0f);
 
 PARAM_DEFINE_FLOAT(AAH_K_RUD_P, 0.4f);
-
-PARAM_DEFINE_FLOAT(AAH_K_RAD_ER_P, 0.7f);
 
 PARAM_DEFINE_FLOAT(AAH_THRO_LINE, 1.0f);
 PARAM_DEFINE_FLOAT(AAH_THRO_CIRC, 0.7f);
@@ -97,7 +93,6 @@ PARAM_DEFINE_FLOAT(INVERT_AIL_SERV, 0.0f);
 PARAM_DEFINE_FLOAT(INVERT_RUD_SERV, 0.0f);
 PARAM_DEFINE_FLOAT(INVERT_ELE_SERV, 0.0f);
 
-PARAM_DEFINE_FLOAT(AAH_TRACKPY_MOD,0.0f);
 PARAM_DEFINE_FLOAT(AAH_COMMAND_ALT,0.0f);
 
 PARAM_DEFINE_FLOAT(AAH_C_ROLL_TRM,0.0f);
@@ -124,7 +119,6 @@ int aah_parameters_init(struct aah_param_handles *h)
 
 	h->proportional_altitude_gain 	= param_find("AAH_K_ALT_P");
 	h->derivative_altitude_gain 	= param_find("AAH_K_ALT_D");
-	h->proportional_altitude_gain_cicle		= param_find("AAH_K_ALT_CIR");
 
 	h->proportional_pitch_gain 		= param_find("AAH_K_PIT_P");
 	h->derivative_pitch_gain		= param_find("AAH_K_PIT_D");
@@ -138,8 +132,6 @@ int aah_parameters_init(struct aah_param_handles *h)
 	h->roll_lim 					= param_find("AAH_ROLL_LIM");
 
 	h->proportional_rudder_gain     = param_find("AAH_K_RUD_P");
-	
-	h->proportional_rad_err_gain	= param_find("AAH_K_RAD_ER_P");
 
 	h->throttle_line				= param_find("AAH_THRO_LINE");
 	h->throttle_circle 				= param_find("AAH_THRO_CIRC");
@@ -156,7 +148,6 @@ int aah_parameters_init(struct aah_param_handles *h)
 	h->invert_rud_servo 			= param_find("INVERT_RUD_SERV");
 	h->invert_ele_servo 			= param_find("INVERT_ELE_SERV");
 	
-	h->radius_control_by_roll 		= param_find("AAH_TRACKPY_MOD");
 	h->command_alt   				= param_find("AAH_COMMAND_ALT");
 	
 	h->circle_roll_trim				= param_find("AAH_C_ROLL_TRM");
@@ -186,7 +177,6 @@ int aah_parameters_update(const struct aah_param_handles *h, struct aah_params *
 	// TODO: add the above line for each of your custom parameters.....
 	param_get(h->proportional_altitude_gain, &(p->proportional_altitude_gain));
 	param_get(h->derivative_altitude_gain,   &(p->derivative_altitude_gain));
-	param_get(h->proportional_altitude_gain_cicle,   &(p->proportional_altitude_gain_cicle));
 	
 	param_get(h->proportional_pitch_gain,    &(p->proportional_pitch_gain));
 	param_get(h->derivative_pitch_gain,      &(p->derivative_pitch_gain));
@@ -199,8 +189,6 @@ int aah_parameters_update(const struct aah_param_handles *h, struct aah_params *
 	param_get(h->roll_lim,    				 &(p->roll_lim));
 	
 	param_get(h->proportional_rudder_gain,   &(p->proportional_rudder_gain));
-
-	param_get(h->proportional_rad_err_gain,  &(p->proportional_rad_err_gain));
 
 	param_get(h->throttle_line,				 &(p->throttle_line));
 	param_get(h->throttle_circle,			 &(p->throttle_circle));
@@ -217,7 +205,6 @@ int aah_parameters_update(const struct aah_param_handles *h, struct aah_params *
 	param_get(h->invert_rud_servo,			 &(p->invert_rud_servo));
 	param_get(h->invert_ele_servo,			 &(p->invert_ele_servo));
 	
-	param_get(h->radius_control_by_roll,	 &(p->radius_control_by_roll));
 	param_get(h->command_alt, 				 &(p->command_alt));
 	
 	param_get(h->circle_roll_trim, 			 &(p->circle_roll_trim));
