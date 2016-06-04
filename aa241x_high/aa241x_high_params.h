@@ -170,8 +170,8 @@ struct aah_param_handles {
 	param_t proportional_yaw_gain_circle;
 	
 	
-	param_t pitch_maxmin_circle
-	param_t delta_yaw_maxmin_circle
+	param_t pitch_maxmin_circle;
+	param_t delta_yaw_maxmin_circle;
 };
 
 /**
