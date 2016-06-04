@@ -95,6 +95,8 @@ void altitude_control_circle(float altitude_desired){
 						 aah_parameters.derivative_altitude_gain_circle*vel_D +
 						 aah_parameters.circle_roll_trim;
 
+	roll_desired = math::constrain(roll_desired, -aah_parameters.roll_lim*PI_F/180.0, aah_parameters.roll_lim*PI_F/180.0);
+	high_data.target_roll = math::constrain(roll_desired, -aah_parameters.roll_lim, aah_parameters.roll_lim);
 	roll_control(roll_desired);
 }
 
@@ -118,6 +120,20 @@ void roll_control(float roll_desired){
   	
   	if(aah_parameters.invert_ail_servo>0)	{roll_servo_out =  math::constrain(aileron_desired, -1.0f, 1.0f);}
 	else 									{roll_servo_out = -math::constrain(aileron_desired, -1.0f, 1.0f);}
+}
+
+void yaw_control_circle(float yaw_desired){
+	float delta_yaw = yaw_desired - yaw;
+	if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
+	else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
+
+
+	float pitch_desired = delta_yaw*aah_parameters.proportional_yaw_gain_circle +
+			              yaw_rate*aah_parameters.derivative_yaw_gain_circle +
+				          aah_parameters.circle_pitch_trim;
+	pitch_desired = math::constrain(pitch_desired, -abs(aah_parameters.pitch_maxmin_circle,
+														abs(aah_parameters.pitch_maxmin_circle)));
+	pitch_control(pitch_desired);
 }
 
 void yaw_control(float yaw_desired){
@@ -152,24 +168,39 @@ float getMissionYaw(){
 	return atan2(low_data.next_E-position_E,low_data.next_N-position_N);
 }
 
-void radius_control(float yaw_perp){
-	float delta_dist = sqrtf(pow((low_data.centerE-position_E),2)+pow((low_data.centerN-position_N),2))-low_data.radius;
-	float yaw_desired = yaw_perp + math::constrain(delta_dist*aah_parameters.proportional_rad_err_gain, -PI_F*.5f,PI_F*.5f);
 
-	if(yaw_desired >= PI_F)			{yaw_desired -= 2.0f*PI_F;}
-	else if(yaw_desired <= -PI_F)	{yaw_desired += 2.0f*PI_F;}
-	yaw_control(yaw_desired);
+void radius_control(){
+	float yaw_perp = getMissionYaw();
+	float delta_east = position_E-low_data.centerE;
+	float delta_north = position_N-low_data.centerN;
+	float distance_to_center = sqrtf(pow(delta_east,2)+pow(delta_north,2));
+	float delta_radius = distance_to_center-low_data.radius;
+	float delta_radius_derivative = (vel_N*delta_north+ vel_E*delta_east)/distance_to_center;
+	float delta_yaw = aah_parameters.proportional_radius_gain_circle*delta_radius +
+					  aah_parameters.derivative_radius_gain_circle*delta_radius_derivative;
+	delta_yaw = math::constrain(delta_yaw, -PI_F*0.5f,PI_F*0.5f);
+	float yaw_desired = yaw_perp+delta_yaw;
+	yaw_control_circle(yaw_desired);
 }
 
-void radius_control_with_roll(){
-	float delta_dist = sqrtf(pow((low_data.centerE-position_E),2)+pow((low_data.centerN-position_N),2))-low_data.radius;
-
-	float velocity_filtered = sqrtf(pow(vel_N,2) + pow(vel_E,2));
-	float roll_desired =delta_dist*aah_parameters.proportional_rad_err_gain+float(atan2(pow(velocity_filtered,2),(low_data.radius*9.81f)));
-	if(roll_desired >= PI_F)		{roll_desired -= 2.0f*PI_F;}
-	else if(roll_desired <= -PI_F)	{roll_desired += 2.0f*PI_F;}
-	roll_control(math::constrain(roll_desired, -aah_parameters.roll_lim, aah_parameters.roll_lim));
-}	
+//void radius_control(float yaw_perp){
+//	float delta_dist = sqrtf(pow((low_data.centerE-position_E),2)+pow((low_data.centerN-position_N),2))-low_data.radius;
+//	float yaw_desired = yaw_perp + math::constrain(delta_dist*aah_parameters.proportional_rad_err_gain, -PI_F*.5f,PI_F*.5f);
+//
+//	if(yaw_desired >= PI_F)			{yaw_desired -= 2.0f*PI_F;}
+//	else if(yaw_desired <= -PI_F)	{yaw_desired += 2.0f*PI_F;}
+//	yaw_control(yaw_desired);
+//}
+//
+//void radius_control_with_roll(){
+//	float delta_dist = sqrtf(pow((low_data.centerE-position_E),2)+pow((low_data.centerN-position_N),2))-low_data.radius;
+//
+//	float velocity_filtered = sqrtf(pow(vel_N,2) + pow(vel_E,2));
+//	float roll_desired =delta_dist*aah_parameters.proportional_rad_err_gain+float(atan2(pow(velocity_filtered,2),(low_data.radius*9.81f)));
+//	if(roll_desired >= PI_F)		{roll_desired -= 2.0f*PI_F;}
+//	else if(roll_desired <= -PI_F)	{roll_desired += 2.0f*PI_F;}
+//	roll_control(math::constrain(roll_desired, -aah_parameters.roll_lim, aah_parameters.roll_lim));
+//}
 
 void flight_control() {
 	dt = hrt_absolute_time() - previous_loop_timestamp;
