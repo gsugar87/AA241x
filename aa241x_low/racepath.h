@@ -32,7 +32,7 @@ float lineStartingPoint3[] = {
     471.0,295.0,10.5,            500.0,312.0,20.0
 };
 int isLinePt3[] = {
-    1,
+    0,
     0,
     1
 };

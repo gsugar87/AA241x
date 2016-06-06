@@ -8,7 +8,18 @@ Autopilot Modes:
 5 - Auto Yaw
 6 - Yaw Step
 7 - Auto Rudder Circle
-8 - Auto Radius, Control Roll  (MAKE SURE YOUR PATH has a circle)
-9 - Auto Radius, Control Pitch (MAKE SURE YOUR PATH has a circle)
-10 - Auto Radius, Auto Altitude (MAKE SURE YOUR PATH has a circle)
-11 - Full Mission
+8 - Auto Radius, Control Roll  (MAKE SURE YOUR PATH is 6)
+9 - Auto Radius, Control Pitch (MAKE SURE YOUR PATH is 6)
+10 - Auto Radius, Auto Altitude (MAKE SURE YOUR PATH is 6)
+11 - Debug Circle
+12 - Full Mission
+
+
+Path numbers:
+1 - Durand Predif
+2 - Lag Test Predif
+3 - Durand Circle
+4 - Mission Predif
+5 - Generate Mission Durand
+6 - Test Circle Lag
+7+ - Generate Mission Lag

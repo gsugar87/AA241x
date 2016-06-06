@@ -69,6 +69,8 @@ struct aal_params {
 	float base_buff;
 	float base_theta;
 	float prestart_dist;
+
+	float line_circle_buffer;
 	float alt_climb_start;
 	float alt_climb_height;
 	float alt_0;
@@ -103,6 +105,8 @@ struct aal_param_handles {
 	param_t base_buff;
 	param_t base_theta;
 	param_t prestart_dist;
+
+	param_t line_circle_buffer;
 	param_t alt_climb_start;
 	param_t alt_climb_height;
 	param_t alt_0;

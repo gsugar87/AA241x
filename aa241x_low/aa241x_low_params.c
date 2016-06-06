@@ -69,8 +69,8 @@ PARAM_DEFINE_FLOAT(RADIUS_TARGET,0.0f);
 PARAM_DEFINE_FLOAT(BLINE_SIDE_BUFF,5.0f);
 PARAM_DEFINE_FLOAT(BLINE_THETA,35.0f);
 PARAM_DEFINE_FLOAT(BLINE_START_BUFF,10.0f);
-PARAM_DEFINE_FLOAT(LINE_CIRC_BUFF,2.0f);
 
+PARAM_DEFINE_FLOAT(LINE_CIRC_BUFF,2.0f);
 PARAM_DEFINE_FLOAT(ALT_CLIMB_START, 10.0f);
 PARAM_DEFINE_FLOAT(ALT_CLIMB_HEIGHT,10.0f);
 PARAM_DEFINE_FLOAT(ALT_0_START,55.0f);
@@ -103,6 +103,8 @@ int aal_parameters_init(struct aal_param_handles *h)
 	h->base_buff 			=   param_find("BLINE_SIDE_BUFF");
 	h->base_theta			=	param_find("BLINE_THETA");
 	h->prestart_dist		=	param_find("BLINE_START_BUFF");
+
+	h->line_circle_buffer   =   param_find("LINE_CIRC_BUFF");
 	h->alt_climb_start		=	param_find("ALT_CLIMB_START");
 	h->alt_climb_height		=	param_find("ALT_CLIMB_HEIGHT");
 	h->alt_0				=	param_find("ALT_0_START");
@@ -130,6 +132,8 @@ int aal_parameters_update(const struct aal_param_handles *h, struct aal_params *
 	param_get(h->base_buff, 			&(p->base_buff));
 	param_get(h->base_theta, 			&(p->base_theta));
 	param_get(h->prestart_dist, 		&(p->prestart_dist));
+	
+	param_get(h->line_circle_buffer, 	&(p->line_circle_buffer));
 	param_get(h->alt_climb_start, 		&(p->alt_climb_start));
 	param_get(h->alt_climb_height, 		&(p->alt_climb_height));
 	param_get(h->alt_0, 				&(p->alt_0));

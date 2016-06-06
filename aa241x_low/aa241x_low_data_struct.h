@@ -73,7 +73,7 @@
 #define LOW_FIELD9 centerN;
 #define LOW_FIELD10 centerE;
 #define LOW_FIELD11 radius;
-#define LOW_FIELD12 variable_name12;
+#define LOW_FIELD12 circle_start_time;
 #define LOW_FIELD13 variable_name13;
 #define LOW_FIELD14 variable_name14;
 #define LOW_FIELD15 variable_name15;
@@ -89,7 +89,7 @@
  * MEET THESE REQUIREMENTS, LOGGING WILL FAIL!!!!!!
  *
  */
-#define LOW_DATA_LABELS "Nwa,Ewa,Awa,Rc,Lin,CrD,dT,isL,ceN,ceE,rad,f12,f13,f14,f15,f16"
+#define LOW_DATA_LABELS "Nwa,Ewa,Awa,Rc,Lin,CrD,dT,isL,ceN,ceE,rad,cst,f13,f14,f15,f16"
 
 struct aa241x_low_data_s {
 	float LOW_FIELD1;

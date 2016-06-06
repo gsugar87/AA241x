@@ -95,6 +95,7 @@ struct aah_params {
 
 	float circle_roll_trim;
 	float circle_elev_trim;
+	float circle_elev_delay;
 	
 	float derivative_altitude_gain_circle;
 	float proportional_altitude_gain_circle;
@@ -106,6 +107,7 @@ struct aah_params {
 	float proportional_pitch_gain_circle;
 	float pitch_maxmin_circle;
 	float delta_yaw_maxmin_circle;
+	float elevator_min_circle;
 };
 
 
@@ -155,6 +157,7 @@ struct aah_param_handles {
 	
 	param_t circle_roll_trim;
 	param_t circle_elev_trim;
+	param_t circle_elev_delay;
 	
 	param_t derivative_altitude_gain_circle;
 	param_t proportional_altitude_gain_circle;
@@ -167,6 +170,7 @@ struct aah_param_handles {
 	
 	param_t pitch_maxmin_circle;
 	param_t delta_yaw_maxmin_circle;
+	param_t elevator_min_circle;
 };
 
 /**

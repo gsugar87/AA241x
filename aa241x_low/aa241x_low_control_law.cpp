@@ -209,15 +209,15 @@ float * calcRacePath(float *pylonStart, float *pylon1, float *pylon2){
     racePath[6*4+2] = aal_parameters.alt_0;
     racePath[6*4+3] = start[0];
     racePath[6*4+4] = start[1];
-    racePath[6*4+5] = aal_parameters.alt_1;
+    racePath[6*4+5] = aal_parameters.alt_0;
 
     // Get Start to Inter1
     racePath[6*5+0] = start[0];
     racePath[6*5+1] = start[1];
-    racePath[6*5+2] = mission_parameters.min_alt+10;
+    racePath[6*5+2] = aal_parameters.alt_0;
     racePath[6*5+3] = start[0]+sinf(target_angle_1)*start_to_inter1_dist;
     racePath[6*5+4] = start[1]+cosf(target_angle_1)*start_to_inter1_dist;
-    racePath[6*5+5] = mission_parameters.min_alt+10;
+    racePath[6*5+5] = aal_parameters.alt_1;
 
     //Get Center1
     racePath[6*6+0] = pylon1[0];
@@ -484,6 +484,7 @@ bool transitionLine(){
         //The Transition is Line to Circle
         else if(isLinePts[low_data.line_index]){
             float* end_to_plane_coeffArray = calculateLineCoeffs(endN,position_N,endE,position_E,false);
+
             float end_to_plane_nCoeff = end_to_plane_coeffArray[0];
             float end_to_plane_eCoeff = end_to_plane_coeffArray[1];
 
@@ -513,6 +514,15 @@ void updateLineParameters(){
     float*  coeffArray = calculateLineCoeffs(originN,endN,originE,endE,true);
     nCoeff = coeffArray[0];
     eCoeff = coeffArray[1];
+
+    //If line to Circle, move the transition value a bit back
+    if(low_data.line_index < n_numOfPts){
+        //The Transition is a Line to Circle
+        if(isLinePts[low_data.line_index] & ~isLinePts[low_data.line_index+1]){
+            endN  -= aal_parameters.line_circle_buffer*nCoeff;
+            endE  -= aal_parameters.line_circle_buffer*eCoeff;
+        }
+    }
 }
 
 void updateCircleParameters(){
@@ -522,6 +532,8 @@ void updateCircleParameters(){
 
     low_data.centerN = centerN;
     low_data.centerE = centerE;
+
+    low_data.circle_start_time = timestamp;
 
     currentTurn = turn_num;
 }

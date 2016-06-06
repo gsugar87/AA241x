@@ -62,6 +62,7 @@ using namespace aa241x_high;
 float altitude_desired = 0.0f;
 float velocity_desired = 0.0f;
 float last_man_throttle_in = 0.0f;
+float start_circle_time = 0.0f;
 
 float dt = 0.0f;
 
@@ -109,7 +110,7 @@ void rudder_control_line(){
 	yaw_servo_out = 0;
 }
 
-void line_control(){
+void line_control(){ 
 	velocity_control_line();
 	altitude_control_line(low_data.next_Alt);
 	rudder_control_line();
@@ -157,9 +158,9 @@ void yaw_control_circle(float yaw_desired){
 	float elevator_desired = aah_parameters.proportional_yaw_gain_circle*delta_yaw +
 			              	 aah_parameters.derivative_yaw_gain_circle*(-yaw_rate) +
 				          	 aah_parameters.circle_elev_trim;
-
-	if(aah_parameters.invert_ele_servo>0)	{pitch_servo_out =  math::constrain(elevator_desired, -1.0f, 1.0f);}
-	else 									{pitch_servo_out = -math::constrain(elevator_desired, -1.0f, 1.0f);}
+	elevator_desired *= sinf(roll);
+	if(aah_parameters.invert_ele_servo>0)	{pitch_servo_out =  math::constrain(elevator_desired, aah_parameters.elevator_min_circle, 1.0f);}
+	else 									{pitch_servo_out = -math::constrain(elevator_desired, aah_parameters.elevator_min_circle, 1.0f);}
 }
 
 void rudder_control_circle(){
@@ -180,7 +181,8 @@ float getMissionYaw(){
 	return atan2(low_data.next_E-position_E,low_data.next_N-position_N);
 }
 
-
+//Old Radius Control
+/*
 void radius_control(){
 	float delta_east = position_E-low_data.centerE;
 	float delta_north = position_N-low_data.centerN;
@@ -193,6 +195,31 @@ void radius_control(){
 	float yaw_perp = getMissionYaw();
 	float yaw_desired = yaw_perp+delta_yaw;
 	yaw_control_circle(yaw_desired);
+}
+*/
+void radius_control(){
+	/*
+	float delta_east = position_E-low_data.centerE;
+	float delta_north = position_N-low_data.centerN;
+	float distance_to_center = sqrtf(pow(delta_east,2)+pow(delta_north,2));
+	//float delta_radius = distance_to_center-low_data.radius;
+	float delta_radius_derivative = (vel_N*delta_north + vel_E*delta_east)/distance_to_center;
+	float elevator_desired = aah_parameters.proportional_radius_gain_circle*distance_to_center -
+			              	 aah_parameters.derivative_radius_gain_circle*delta_radius_derivative +
+							 aah_parameters.circle_elev_trim;
+	*/
+	if(hrt_absolute_time()- low_data.circle_start_time > aah_parameters.circle_elev_delay*1000000.0f){
+		float delta_yaw =getMissionYaw()-yaw;
+	    if(delta_yaw >= PI_F)			{delta_yaw -= 2.0f*PI_F;}
+		else if(delta_yaw <= -PI_F)		{delta_yaw += 2.0f*PI_F;}
+
+		float elevator_desired = aah_parameters.proportional_radius_gain_circle*delta_yaw +
+				              	 aah_parameters.derivative_radius_gain_circle*(-yaw_rate) +
+								 aah_parameters.circle_elev_trim;
+
+		if(aah_parameters.invert_ele_servo>0)	{pitch_servo_out =  math::constrain(elevator_desired, aah_parameters.elevator_min_circle, 1.0f);}
+		else 									{pitch_servo_out = -math::constrain(elevator_desired, aah_parameters.elevator_min_circle, 1.0f);}
+	}	
 }
 
 
@@ -285,7 +312,7 @@ void flight_control() {
 		else{
 			velocity_control_circle();
 			rudder_control_circle();
-			roll_control(man_roll_in*PI_F*.5f);
+			roll_control(man_roll_in*PI_F*.2f+aah_parameters.circle_roll_trim*PI_F/180.0f);
 			radius_control();
 		}
 	}
@@ -311,9 +338,15 @@ void flight_control() {
 		else{
 			velocity_control_circle();
 			rudder_control_circle();
-			altitude_control_circle(altitude_desired);
+			altitude_control_circle(aah_parameters.command_alt);
 			radius_control();
 		}
+	}
+	else if(aah_parameters.test_case<=11.0f){
+		velocity_control_circle();
+		rudder_control_circle();
+		altitude_control_circle(altitude_desired);
+		radius_control();
 	}
 	//FULL MISSION
 	else{

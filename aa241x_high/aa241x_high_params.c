@@ -97,6 +97,9 @@ PARAM_DEFINE_FLOAT(AAH_COMMAND_ALT,0.0f);
 
 PARAM_DEFINE_FLOAT(AAH_C_ROLL_TRM,0.0f);
 PARAM_DEFINE_FLOAT(AAH_C_ELEV_TRM,0.0f);
+PARAM_DEFINE_FLOAT(AAH_C_ELEV_DEL,0.0f);
+
+
 PARAM_DEFINE_FLOAT(AAH_C_ALT_P,0.0f);
 PARAM_DEFINE_FLOAT(AAH_C_ALT_D,0.0f);
 PARAM_DEFINE_FLOAT(AAH_C_RAD_P,0.0f);
@@ -107,6 +110,7 @@ PARAM_DEFINE_FLOAT(AAH_C_PIT_P,0.0f);
 PARAM_DEFINE_FLOAT(AAH_C_PIT_D,0.0f);
 PARAM_DEFINE_FLOAT(AAH_C_PIT_MAX,0.0f);
 PARAM_DEFINE_FLOAT(AAH_C_YAW_MAX,0.0f);
+PARAM_DEFINE_FLOAT(AAH_C_ELE_MIN,0.3f);
 
 int aah_parameters_init(struct aah_param_handles *h)
 {
@@ -154,6 +158,7 @@ int aah_parameters_init(struct aah_param_handles *h)
 	
 	h->circle_roll_trim				= param_find("AAH_C_ROLL_TRM");
 	h->circle_elev_trim				= param_find("AAH_C_ELEV_TRM");
+	h->circle_elev_delay			= param_find("AAH_C_ELEV_DEL");
 	
 	h->derivative_altitude_gain_circle		= param_find("AAH_C_ALT_D");
 	h->proportional_altitude_gain_circle	= param_find("AAH_C_ALT_P");
@@ -169,6 +174,7 @@ int aah_parameters_init(struct aah_param_handles *h)
 	
 	h->pitch_maxmin_circle				= param_find("AAH_C_PIT_MAX");
 	h->delta_yaw_maxmin_circle			= param_find("AAH_C_YAW_MAX");
+	h->elevator_min_circle              = param_find("AAH_C_ELE_MIN");
 	// TODO: add the above line for each of your custom parameters........
 
 	return OK;
@@ -214,6 +220,7 @@ int aah_parameters_update(const struct aah_param_handles *h, struct aah_params *
 	
 	param_get(h->circle_roll_trim, 			 &(p->circle_roll_trim));
 	param_get(h->circle_elev_trim, 			 &(p->circle_elev_trim));
+	param_get(h->circle_elev_delay, 		 &(p->circle_elev_delay));
 	
 	param_get(h->derivative_altitude_gain_circle, 		 	&(p->derivative_altitude_gain_circle));
 	param_get(h->proportional_altitude_gain_circle, 		&(p->proportional_altitude_gain_circle));
@@ -226,6 +233,7 @@ int aah_parameters_update(const struct aah_param_handles *h, struct aah_params *
 	
 	param_get(h->pitch_maxmin_circle, 		 			&(p->pitch_maxmin_circle));
 	param_get(h->delta_yaw_maxmin_circle, 				&(p->delta_yaw_maxmin_circle));
+	param_get(h->elevator_min_circle, 					&(p->elevator_min_circle));
 	
 
 	
